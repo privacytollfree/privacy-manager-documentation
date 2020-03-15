@@ -203,5 +203,10 @@ other | String, a message from the user.
 remote_ip:  | String, The IP address of the requester
 
 
+## Edge Case ##
+
+You have setup your webhook after you received a couple request, and you are receiving privacy_request.updated events without their corresponding privacy_request.created. You will have to create the privacy_requests now in your system. Don't forget you could be receiving multiple privacy_request.updated events, and therefore you will need a locking strategy. You may decide to lock on a parent object, or use an upsert if your database supports updating to the values of the latest timestamp signature. 
+
+
 
 
