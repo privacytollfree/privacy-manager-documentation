@@ -4,7 +4,7 @@
 
 ## Webhooks Introduction ##
 
-Webhooks from your privacy manager at ccpatollfree.com allows you to retrieve data from your privacy request in real time securely. We only support webhooks https URL. We do not restrict any cypher suite as we believe it's your responsibility to chose the right https cypher. Our webhooks are triggered based on events happening in the system. For instance, a privacy_request.received sends all data about the privacy request that's available at the time. The voicemail, or transcription may come later. Each event always include the latest state of the object you are about to receive - even under replay. We are not maintaining a list of changes, rather we order every events in the system and send all the data available. You may use the signature timestamp to evaluate when the object was loaded, and it's safe to say that the latest value is always the one with the latest signature timetamps. You should keep that in your record. If you replay an older event, we will fetch the latest state of the object, and the signature timestamp will be the time now, so you are safe to update your record. Note that we are in the process of building a full API, and you may reach out to us if you wish to request something.
+Webhooks from your privacy manager at ccpatollfree.com allows you to retrieve data from your privacy request in real time securely. We only support webhooks https URL. We do not restrict any cypher suite as we believe it's your responsibility to chose the right https cypher. Our webhooks are triggered based on events happening in the system. For instance, a privacy_request.received sends all data about the privacy request that's available at the time. The voicemail, or transcription may come later. Each event always include the latest state of the object you are about to receive - even under replay. We are not maintaining a list of changes, rather we order every events in the system and send all the data available. You may use the signature timestamp to evaluate when the object was loaded, and it's safe to say that the latest value is always the one with the latest signature timetamps. You should keep that in your record. If you replay an older event, we will fetch the latest state of the object, and the signature timestamp will be the time now, so you are safe to update your record. Note that we are in the process of building a full API, and you may reach out to us if you wish to request something. All request are currently multipart due to the nature of privacy request.
 
 ## Security ##
 
@@ -132,7 +132,7 @@ As previously states both events will push the latest privacy request data. Ther
 
 # Privacy Request
 
-First Header | Second Header
+Key | Description
 ------------ | -------------
 event_name | String, eg: "privacy_request.received"
 signature | Object, with a random token, a timestamp in milliseconds, and a signature. Please refer to the security section to use this
@@ -147,7 +147,7 @@ updated_at | Timestamp, the last time this object was updated.
 
 # Service code #
 
-First Header | Second Header
+Key | Description
 ------------ | -------------
 code | String, your service code for this request.
 name | String, your service code name for this request
@@ -156,7 +156,7 @@ updated_at | Timestamp, the last time this object was updated.
 
 # Call Session #
 
-First Header | Second Header
+Key | Description
 ------------ | -------------
 recording_status | String, "completed", when bytes are available, or "failed".
 mp3_encoded_byes | String, a based64 encoded string representing the bytes of the mp3
@@ -171,8 +171,9 @@ transcription_text | "Hello world!"
 
 # Call Session #
 
-First Header | Second Header
+Key | Description
 ------------ | -------------
+id | String, UUID of the call session
 recording_status | String, "completed", when bytes are available, or "failed".
 mp3_encoded_byes | String, a based64 encoded string representing the bytes of the mp3
 created_at | Timestamp at we received the call for this request
@@ -180,12 +181,12 @@ ended_at | Timestamp when the caller hung up
 caller_id | String, the phone number we received
 caller_name | String CNAM Lookup of the caller name
 caller_state | String e.g. "CA" state of the consumer derived from area code of the number
-transcription_status | String, "completed" if we completed the transcription.
-transcription_text | "Hello world!"
+transcription_status | String, "completed" if we completed the transcription, or "failed", or null if we the service code didn't enable transcription in your service code tab.
+transcription_text | String "Hello world!"
 
 
 # Web From Session #
-First Header | Second Header
+Key | Description
 ------------ | -------------
 id | UUID of the web form session
 created_at | Timestamp at we received the webform for this request
