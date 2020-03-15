@@ -1,14 +1,14 @@
-# Privacy Manager Documentation
+# CCPA Toll Free, Privacy Manager Documentation
 
 ### Get Started with CCPATollFree Webhooks, the value provider for toll free number for and privacy request manager.  ###
 
 ## Webhooks Introduction ##
 
-Webhooks from your privacy manager at ccpatollfree.com allows you to retrieve data from your privacy request in real time securely. We only support webhooks https URL. We do not restrict any cypher suite as we believe it's your responsibility to chose the right https cypher. Our webhooks are triggered based on events happening in the system. For instance, a privacy_request.received sends all data about the privacy request that's available at the time. The voicemail, or transcription may come later. Each event always include the latest state of the object you are about to receive - even under replay. We are not maintaining a list of changes, rather we order every events in the system and send all the data available. You may use the signature timestamp to evaluate when the object was loaded, and it's safe to say that the latest value is always the one with the latest signature timetamps. You should keep that in your record. If you replay an older event, we will fetch the latest state of the object, and the signature timestamp will be the time now, so you are safe to update your record. Note that we are in the process of building a full API, and you may reach out to us if you wish to request something. All request are currently multipart due to the nature of privacy request.
+Webhooks from your privacy manager at ccpatollfree.com allows you to retrieve data from your privacy requests in real time and securely. We only support webhook https URL. We do not restrict any cypher suite as we believe it's your responsibility to chose the right https cypher. Our webhooks are triggered based on events happening in our system. For instance, a privacy_request.received sends all data about the privacy request that's available at that time. Each event always include the latest state of the object you are about to receive - even under retry. We are not maintaining a list of changes, rather we order every events in the system and send all the data available. It's safe to use the signature timestamp as your means to order the object states. You should keep that signature timestamp to safeguard against older events. If you replay an older event, we will fetch the latest state of the object, and the signature timestamp will be the time now, so you are safe to update your record. Note that we are in the process of building a full API, and you may reach out to us if you wish to disclose your use-case. All http requests are multipart due to the nature of CCPA privacy request.
 
 ## Security ##
 
-When it comes to webhook, you must validate that the data comes from us. The signature parameters in our request to your endpoint will contain three fields. A random token, a timestamp (milliseconds since Janaury 1, 1970), and a signature which is a HMAC SHA256 of the timestamp concatenated with the random token encrypted with your API Key found in the Webhooks tab. 
+When it comes to webhook, you must validate that the data comes from us. The signature parameters in our request to your endpoint will contain three fields: a random token, a timestamp (milliseconds since Janaury 1, 1970), and a signature which is a HMAC SHA256 of the timestamp concatenated with the random token encrypted with your API Key found in the Webhooks tab in your dashboard. 
 
 In order to decode it, please refer to this ruby on rails example:
 
@@ -27,15 +27,15 @@ In order to decode it, please refer to this ruby on rails example:
     end
 ```
 
-Follow best procedures to store and access your private API key. In this example, we stored it securely as an environment variable.
+Follow best procedures to store and access your private API key. In this example, we stored it securely in an environment variable.
 
-Another set of attacks on webhooks are replay attacks. An attacker may find that they can replay the full https encrypted webhook. Please check the timestamp at which it was signed. 
+Another set of attacks on webhooks are replay attacks. An attacker may find that they can replay the full https encrypted webhook. Please check the timestamp at which it was signed, and you may have add a 5 minute check and not allow those.
 
 ## Automatic Retry, and Manual Retry ##
 
-We will automatically retry three times 30 minutes apart before stopping retrying. Then it will on you to retry the events manually by going into the your privacy manager and click the retry icon on the webhooks log. If you wish to retry all failed events, we will have an API for that. In the meantime please contact us if you have custom request as such.
+We will automatically retry three times 30 minutes apart before stopping. Then it will be on you to retry the events manually by going into the your privacy manager and click the retry icon on the webhooks log. If you wish to retry all failed events, we will have an API for that. In the meantime please contact us if you have custom requests as such.
 
-The timestamp of the signature is recalculated, and the latest state of the data is fetched again, and then pushed to you. 
+The timestamp of the signature is recalculated at the time of the retry. The latest state of the data is fetched again, and then pushed to you. 
 
 
 ## Developing ##
@@ -112,12 +112,13 @@ Those events will contain the latest state of the privacy request data. When a v
     updated_at: "2020-01-26 05:59:40 UTC"
   },
   call_session: {
-    recording_status: ""
-    mp3_encoded_bytes: ""
     created_at: "2019-09-21 16:31:11 UTC"
     ended_at: "2019-09-21 16:33:11 UTC"
+    caller_id: "+15555555555"
     caller_name: "John Smith"
     caller_state: "CA"
+    recording_status: ""
+    mp3_encoded_bytes: ""
     transcription_status: "completed"
     transcription_text: "Hello world!"
   }
@@ -126,7 +127,7 @@ Those events will contain the latest state of the privacy request data. When a v
 ```
 
 
-As previously states both events will push the latest privacy request data. There is only two types of requests, WebForm and voicemail. The field call_session will be available for a voicemail privacy request, web_form_session will be available for a webform request.
+As previously stated both events will push the latest privacy request data. There is only two types of requests, WebForm and voicemail. Call_session will be available for a voicemail privacy request, web_form_session will be available for a webform request.
 
 ## Here is a description of the state of each object ##
 
@@ -139,7 +140,7 @@ signature | Object, with a random token, a timestamp in milliseconds, and a sign
 id | UUID, the id as a string of the privacy request in our system.
 type | String, e.g. "Voicemail"
 acknowledged | Boolean, e.g: "false" represent if the privacy request was acknowledged.
-complted | Boolean, e.g: "true" represent if the privacy request was completed.
+completed | Boolean, e.g: "true" represent if the privacy request was completed.
 extended | Boolean, e.g: "false" represent if the privacy request was extended.
 deadline | Date, eg: "2019-11-05", calculated based on the extennded field, and created_at
 created_at | Timestamp, the time at which we received this request
@@ -158,31 +159,15 @@ updated_at | Timestamp, the last time this object was updated.
 
 Key | Description
 ------------ | -------------
-recording_status | String, "completed", when bytes are available, or "failed".
-mp3_encoded_byes | String, a based64 encoded string representing the bytes of the mp3
 created_at | Timestamp at we received the call for this request
 ended_at | Timestamp when the caller hung up
 caller_id | String, the phone number we received
 caller_name | String CNAM Lookup of the caller name
 caller_state | String e.g. "CA" state of the consumer derived from area code of the number
+recording_status | String, "completed", when bytes are available, or "failed".
+mp3_encoded_byes | String, a based64 encoded string representing the bytes of the mp3
 transcription_status | String, "completed" if we completed the transcription.
 transcription_text | "Hello world!"
-
-
-# Call Session #
-
-Key | Description
------------- | -------------
-id | String, UUID of the call session
-recording_status | String, "completed", when bytes are available, or "failed".
-mp3_encoded_byes | String, a based64 encoded string representing the bytes of the mp3
-created_at | Timestamp at we received the call for this request
-ended_at | Timestamp when the caller hung up
-caller_id | String, the phone number we received
-caller_name | String CNAM Lookup of the caller name
-caller_state | String e.g. "CA" state of the consumer derived from area code of the number
-transcription_status | String, "completed" if we completed the transcription, or "failed", or null if we the service code didn't enable transcription in your service code tab.
-transcription_text | String "Hello world!"
 
 
 # Web From Session #
