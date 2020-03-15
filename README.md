@@ -126,6 +126,81 @@ Those events will contain the latest state of the privacy request data. When a v
 ```
 
 
+As previously states both events will push the latest privacy request data. There is only two types of requests, WebForm and voicemail. The field call_session will be available for a voicemail privacy request, web_form_session will be available for a webform request.
+
+## Here is a description of the state of each object ##
+
+# Privacy Request
+
+First Header | Second Header
+------------ | -------------
+event_name | String, eg: "privacy_request.received"
+signature | Object, with a random token, a timestamp in milliseconds, and a signature. Please refer to the security section to use this
+id | UUID, the id as a string of the privacy request in our system.
+type | String, e.g. "Voicemail"
+acknowledged | Boolean, e.g: "false" represent if the privacy request was acknowledged.
+complted | Boolean, e.g: "true" represent if the privacy request was completed.
+extended | Boolean, e.g: "false" represent if the privacy request was extended.
+deadline | Date, eg: "2019-11-05", calculated based on the extennded field, and created_at
+created_at | Timestamp, the time at which we received this request
+updated_at | Timestamp, the last time this object was updated.
+
+# Service code #
+
+First Header | Second Header
+------------ | -------------
+code | String, your service code for this request.
+name | String, your service code name for this request
+created_at | Timestamp at which your created the service code
+updated_at | Timestamp, the last time this object was updated.
+
+# Call Session #
+
+First Header | Second Header
+------------ | -------------
+recording_status | String, "completed", when bytes are available, or "failed".
+mp3_encoded_byes | String, a based64 encoded string representing the bytes of the mp3
+created_at | Timestamp at we received the call for this request
+ended_at | Timestamp when the caller hung up
+caller_id | String, the phone number we received
+caller_name | String CNAM Lookup of the caller name
+caller_state | String e.g. "CA" state of the consumer derived from area code of the number
+transcription_status | String, "completed" if we completed the transcription.
+transcription_text | "Hello world!"
+
+
+# Call Session #
+
+First Header | Second Header
+------------ | -------------
+recording_status | String, "completed", when bytes are available, or "failed".
+mp3_encoded_byes | String, a based64 encoded string representing the bytes of the mp3
+created_at | Timestamp at we received the call for this request
+ended_at | Timestamp when the caller hung up
+caller_id | String, the phone number we received
+caller_name | String CNAM Lookup of the caller name
+caller_state | String e.g. "CA" state of the consumer derived from area code of the number
+transcription_status | String, "completed" if we completed the transcription.
+transcription_text | "Hello world!"
+
+
+# Web From Session #
+First Header | Second Header
+------------ | -------------
+id | UUID of the web form session
+created_at | Timestamp at we received the webform for this request
+first_name | String, first name of the requester
+last_name | String, last name of the requester
+email | String, email of the requester
+state | String State of the requester reported on the webform eg: "DE"
+requester_type | String type of requester. e.g.: "Consumer"
+send_me | Boolean, eg: "true" User request that you send a copy of his information
+tell_me | Boolean, eg: "false" User request that you tell him more about the information collected and why.
+delete_me | Boolean, eg: "false" User request that you delete the information collected about him.
+do_not_sell | Boolean, eg: "true" User Request that you stop selling his information.
+other | String, a message from the user.
+remote_ip:  | String, The IP address of the requester
+
 
 
 
