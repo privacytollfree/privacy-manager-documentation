@@ -21,7 +21,7 @@ In order to decode it, please refer to this ruby on rails example:
           ENV['CCPATollFree_WEBHOOK_PRIVATE_API_TOKEN'], "#{timestamp}#{token}")
 
     if signed_test_data == signature
-        # the request is accpeted
+        # the request is accepted
     else
       raise "CCPATollfree.com did not authenticate"
     end
@@ -35,7 +35,7 @@ Another set of attacks on webhooks are replay attacks. An attacker may find that
 
 We will automatically retry three times 30 minutes apart before stopping. Then it will be on you to retry the events manually by going into the your privacy manager and click the retry icon on the webhooks log. If you wish to retry all failed events, we will have an API for that. In the meantime please contact us if you have custom requests as such.
 
-The timestamp of the signature is recalculated at the time of the retry. The latest state of the data is fetched again, and then pushed to you. 
+The timestamp of the signature is recalculated at the time of the retry. The latest state of the data is fetched again, and then pushed to you. We have two separate status: recording_status, and transcription_status. Those two when "completed" will have mp3_encoded_bytes and transcription_text ready respectivaly. 
 
 
 ## Developing ##
@@ -88,6 +88,7 @@ Those events will contain the latest state of the privacy request data. When a v
 }
 ```
 
+Here is an example of a privacy_request.updated for a voicemail request:
 
 
 ```
@@ -192,6 +193,8 @@ remote_ip:  | String, The IP address of the requester
 
 You have setup your webhook after you received a couple request, and you are receiving privacy_request.updated events without their corresponding privacy_request.created. You will have to create the privacy_requests now in your system. Don't forget you could be receiving multiple privacy_request.updated events, and therefore you will need a locking strategy. You may decide to lock on a parent object, or use an upsert if your database supports updating to the values of the latest timestamp signature. 
 
+## Recommendation ##
 
+If you have a table called service_codes, I would prepoluate those with your service codes from the dashboard. Then, when a privacy_request.* gets sent, I would lock for update on your service code record, then find the privacy request or create it. If you have found it, check the latest timestamp signature to know if you should update any column. Make sure to follow the security protocol to secure your endpoints as describe in the security section.
 
 
