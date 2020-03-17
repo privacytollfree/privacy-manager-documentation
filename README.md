@@ -189,12 +189,9 @@ other | String, a message from the user.
 remote_ip:  | String, The IP address of the requester
 
 
-## Edge Case ##
+## Edge Case And Recommendations ##
 
-You have setup your webhook after you received a couple request, and you are receiving privacy_request.updated events without their corresponding privacy_request.created. You will have to create the privacy_requests now in your system. Don't forget you could be receiving multiple privacy_request.updated events, and therefore you will need a locking strategy. You may decide to lock on a parent object, or use an upsert if your database supports updating to the values of the latest timestamp signature. 
+You have setup your webhook after you received a couple request, and you are receiving privacy_request.updated events without their corresponding privacy_request.created. I recommend you correct those requests manually, or simply start recording the privacy requests into your system after the ones in transit are done. If you need us to send webhooks of all the previousprivacy requests, let us know.
 
-## Recommendation ##
-
-If you have a table called service_codes, I would prepoluate those with your service codes from the dashboard. Then, when a privacy_request.* gets sent, I would lock for update on your service code record, then find the privacy request or create it. If you have found it, check the latest timestamp signature to know if you should update any column. Make sure to follow the security protocol to secure your endpoints as describe in the security section.
-
+Sometimes, we can send a privacy_request.updated soon after it was received due to the mp3 being available, and the transcription being available. It could happen that it makes it in before the privacy_request.received. The simplest solution is to create the privacy request record in your system when receiving privacy_request.received. And update the fields based on the timestamp of the privacy_request.updated. If you do receive a privacy_request.updated before a privacy_request.received, you can just throw a specific error in your system, PrivacyRequestNotFound, and we will automatically retry that event in 30 minutes if we received anything else than a 200. It should not happen often, but if it does you may either have a locking strategy on a parent record like a service code record, use upsert based on latest timestamp, or write out those failed privacy_request.updated event and have a job that will retry them on your own system a few minutes later hoping you have received the privacy_request.received by then.
 
