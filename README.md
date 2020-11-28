@@ -33,7 +33,7 @@ Another set of attacks on webhooks are replay attacks. An attacker may find that
 
 ## Automatic Retry, and Manual Retry ##
 
-We will automatically retry three times 30 minutes apart before stopping. Then it will be on you to retry the events manually by going into the your privacy manager and click the retry icon on the webhooks log. If you wish to retry all failed events, we will have an API for that. In the meantime please contact us if you have custom requests as such.
+We will automatically retry three times 30 minutes apart before stopping when a webhook fails. Then it will be on you to retry the events manually by going into the your privacy manager and click the retry icon on the webhooks log. If you wish to retry all failed events, we will have an API for that. In the meantime please contact us if you have custom requests as such.
 
 The timestamp of the signature is recalculated at the time of the retry. The latest state of the data is fetched again, and then pushed to you. We have two separate status: recording_status, and transcription_status. Those two when "completed" will have mp3_encoded_bytes and transcription_text ready respectivaly. 
 
